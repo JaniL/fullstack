@@ -1,5 +1,6 @@
 # sivun aukaisu
 
+```
 selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa
 palvelin->selain: HTML-koodi
 selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
@@ -13,3 +14,4 @@ selain->dokumentti: Selain alkaa pyörittää JavaScript-koodia. Haetaan muistii
 selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
 palvelin->selain: Muistiinpanot JSON-muodossa
 selain->dokumentti: renderoidaan muistiinpanot
+```
