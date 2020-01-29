@@ -38,12 +38,14 @@ const Statistics = ({ good, neutral, bad}) => {
     <div>
       <h1>statistiikka</h1>
       <table>
-        <Statistic text="hyvä" value={good} />
-        <Statistic text="neutraali" value={neutral} />
-        <Statistic text="huono" value={bad} />
-        <Statistic text="yhteensä" value={sum} />
-        <Statistic text="keskiarvo" value={average} />
-        <Statistic text="positiivisia" value={`${positive} %`} />
+        <tbody>
+          <Statistic text="hyvä" value={good} />
+          <Statistic text="neutraali" value={neutral} />
+          <Statistic text="huono" value={bad} />
+          <Statistic text="yhteensä" value={sum} />
+          <Statistic text="keskiarvo" value={average} />
+          <Statistic text="positiivisia" value={`${positive} %`} />
+        </tbody>
       </table>
     </div>
   )
