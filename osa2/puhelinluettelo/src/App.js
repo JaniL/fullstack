@@ -14,8 +14,12 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setPersons(state => [...state, { name: newName }])
-    setNewName('')
+    const personExists = persons.findIndex(({ name }) => name === newName) !== -1
+    setPersons(state => !personExists ? [...state, { name: newName }] : state)
+    setNewName(state => !personExists ? '' : state)
+    if (personExists) {
+      alert(`${newName} is already added to phonebook`)
+    }
   }
 
   return (
