@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 const Persons = ({ persons }) => persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
 
@@ -15,15 +16,19 @@ const PersonForm = ({ handleSubmit, newName, newPhoneNumber, handleNameOnChange,
 </form></>
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [persons, setPersons] = useState(undefined)
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('')
   const [filter, setFilter] = useState('')
+
+  useEffect(() => {
+    if (persons !== undefined) {
+      // setPersons(state => state)
+      return
+    } 
+    axios.get('http://localhost:3001/persons')
+      .then(res => setPersons(state => state === undefined ? res.data : state))
+  }, [persons])
 
   const handleNameOnChange = (e) => {
     setNewName(e.target.value)
@@ -48,7 +53,9 @@ const App = () => {
     }
   }
 
-  const filteredPersons = filter.length > 0 ? persons.filter(({ name }) => name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) : persons
+  const allPersons = persons !== undefined ? persons : []
+
+  const filteredPersons = filter.length > 0 ? allPersons.filter(({ name }) => name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) : allPersons
 
   return (
     <div>
