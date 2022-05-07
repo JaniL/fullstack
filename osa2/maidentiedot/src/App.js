@@ -12,25 +12,69 @@ const Search = ({ filter, setFilter }) => {
   )
 }
 
+const CityWeather = ({ cityName }) => {
+  const [weatherData, setWeatherData] = useState(undefined)
+  const { REACT_APP_API_KEY } = process.env
+
+  useEffect(() => {
+    if (!REACT_APP_API_KEY || weatherData !== undefined) {
+      return
+    }
+    axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
+      params: {
+        q: cityName,
+        appid: REACT_APP_API_KEY,
+        units: 'metric'
+      }
+    })
+      .then(res => setWeatherData(res.data))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityName])
+
+  if (!REACT_APP_API_KEY) {
+    return 'openweathermap api key not set'
+  }
+
+  if (!weatherData) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>Weather in {cityName}</h2>
+      <p>
+        temperature {weatherData.main.temp} Celcius
+      </p>
+      <p>
+        <img src={`http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`} alt={weatherData.weather.main} />
+      </p>
+      <p>
+        wind {weatherData.wind.speed} m/s
+      </p>
+    </div>
+  )
+}
+
 const SingleCountryView = ({country}) => {
   const languageValues = Object.values(country.languages)
   const flagUrl = country.flags.svg || country.flags.png
   return (
     <div>
       <h1>{country.name.common}</h1>
-      <p>
+      <div>
         capital {country.capital}<br/>
         area {country.area}
-      </p>
-      <p>
+      </div>
+      <div>
         <b>languages:</b>
         <ul>
-          {languageValues.map(languageValue => <li>{languageValue}</li>)}
+          {languageValues.map(languageValue => <li key={languageValue}>{languageValue}</li>)}
         </ul>
-      </p>
-      <p>
+      </div>
+      <div>
         <img src={flagUrl} alt={`Flag of ${country.name.common}`} style={{width: '150px'}} />
-      </p>
+      </div>
+      <CityWeather cityName={country.capital[0]} />
     </div>
   )
 }
@@ -66,10 +110,10 @@ const CountryDataView = ({ filter, countryData }) => {
   return (
     <div>
       {sortedCountryNames.map(countryName => (
-        <>
+        <span key={countryName}>
         {countryName} <input type="button" value="show" onClick={() => setSelectedCountry(countryName)} />
         <br/>
-        </>
+        </span>
       ))}
     </div>
   )
