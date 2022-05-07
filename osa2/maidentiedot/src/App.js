@@ -36,23 +36,38 @@ const SingleCountryView = ({country}) => {
 }
 
 const CountryDataView = ({ filter, countryData }) => {
+  const [selectedCountry, setSelectedCountry] = useState(undefined)
+  const selectedCountryData = selectedCountry && countryData.find(({ name }) => name.common === selectedCountry)
+
+  // for convenience, clear selectedCountry when the search filter is used
+  useEffect(() => {
+    setSelectedCountry(undefined)
+  }, [filter])
+
+  if (selectedCountryData) {
+    return <SingleCountryView country={selectedCountryData} />
+  }
+
   const countryNameIncludesFilterValue = filterValue => ( { name }) =>
     filterValue.length === 0 ||
     name.common.toLocaleLowerCase().includes(filterValue)
   const filteredCountries = countryData.filter(countryNameIncludesFilterValue(filter.toLocaleLowerCase()))
+
   if (filteredCountries.length > 10) {
     return <div>{'Too many matches, specfic another filter'}</div>
   }
   if (filteredCountries.length === 1) {
-    return <SingleCountryView country={filteredCountries[0]} />
+    const [countryData] = filteredCountries
+    return <SingleCountryView country={countryData} />
   }
+
   const countryNames = filteredCountries.map(( { name }) => name.common)
   const sortedCountryNames = [...countryNames].sort()
   return (
     <div>
       {sortedCountryNames.map(countryName => (
         <>
-        {countryName}
+        {countryName} <input type="button" value="show" onClick={() => setSelectedCountry(countryName)} />
         <br/>
         </>
       ))}
