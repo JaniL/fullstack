@@ -15,4 +15,7 @@ const savePerson = (name, number) =>
 const deletePerson = (id) =>
   jsonServerInstance.delete('/persons/' + id)
 
-export { getAllPersons, savePerson, deletePerson }
+const updatePerson = (id, newName, newNumber) =>
+  jsonServerInstance.put('/persons/' + id, { name: newName, number: newNumber })
+
+export { getAllPersons, savePerson, deletePerson, updatePerson }

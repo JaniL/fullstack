@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAllPersons, savePerson, deletePerson } from './JsonServerService'
+import { getAllPersons, savePerson, deletePerson, updatePerson } from './JsonServerService'
 
 const Persons = ({ persons, updatePersons }) => {
   return persons.map(person => {
@@ -61,11 +61,14 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const personExists = persons.findIndex(({ name }) => name === newName) !== -1
-    setNewName(state => !personExists ? '' : state)
-    setNewPhoneNumber(state => !personExists ? '' : state)
-    if (personExists) {
-      alert(`${newName} is already added to phonebook`)
+    const existingPerson = persons.find(({ name }) => name === newName)
+    const confirmReplace = existingPerson && window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+    const clearForm = !existingPerson || (existingPerson && confirmReplace)
+    setNewName(state => clearForm ? '' : state)
+    setNewPhoneNumber(state => clearForm ? '' : state)
+    if (existingPerson) {
+      updatePerson(existingPerson.id, newName, newPhoneNumber)
+        .then(_ => updatePersons())
     } else {
       savePerson(newName, newPhoneNumber)
         .then(_ => updatePersons())
