@@ -4,12 +4,15 @@ const jsonServerInstance = axios.create({
   baseURL: 'http://localhost:3001'
 })
 
-const getAll = () =>
+const getAllPersons = () =>
   jsonServerInstance.get('/persons')
     .then(res => res.data)
 
 
-const save = (name, number) =>
+const savePerson = (name, number) =>
   jsonServerInstance.post('/persons', { name, number })
 
-export { getAll, save }
+const deletePerson = (id) =>
+  jsonServerInstance.delete('/persons/' + id)
+
+export { getAllPersons, savePerson, deletePerson }

@@ -1,7 +1,20 @@
 import { useEffect, useState } from 'react'
-import { getAll, save } from './JsonServerService'
+import { getAllPersons, savePerson, deletePerson } from './JsonServerService'
 
-const Persons = ({ persons }) => persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
+const Persons = ({ persons, updatePersons }) => {
+  return persons.map(person => {
+    const handleDelete = e => {
+      e.preventDefault()
+      if (window.confirm(`Delete ${person.name} ?`)) {
+        deletePerson(person.id)
+          .then(_ => {
+            updatePersons()
+          })
+      }
+    }
+    return <p key={person.name}>{person.name} {person.number} <input type="button" value="delete" onClick={handleDelete} /></p>
+  })
+}
 
 const Filter = ({ filter, handleFilterOnChange }) => <>filter shown with <input value={filter} type={'text'} onChange={handleFilterOnChange} /></>
 
@@ -22,8 +35,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   const updatePersons = () => {
-    getAll()
-      .then(res => setPersons(state => state === undefined ? res : state))
+    getAllPersons()
+      .then(res => setPersons(res))
   }
 
   useEffect(() => {
@@ -49,13 +62,13 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     const personExists = persons.findIndex(({ name }) => name === newName) !== -1
-    setPersons(state => !personExists ? [...state, { name: newName, number: newPhoneNumber }] : state)
     setNewName(state => !personExists ? '' : state)
     setNewPhoneNumber(state => !personExists ? '' : state)
     if (personExists) {
       alert(`${newName} is already added to phonebook`)
     } else {
-      save(newName, newPhoneNumber)
+      savePerson(newName, newPhoneNumber)
+        .then(_ => updatePersons())
     }
   }
 
@@ -70,7 +83,7 @@ const App = () => {
       <h3>add a new</h3>
       <PersonForm handleSubmit={handleSubmit} newName={newName} newPhoneNumber={newPhoneNumber} handleNameOnChange={handleNameOnChange} handlePhoneNumberOnChange={handlePhoneNumberOnChange}/>
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} updatePersons={updatePersons} />
     </div>
   )
 
