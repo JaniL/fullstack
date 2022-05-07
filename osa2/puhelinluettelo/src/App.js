@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import { getAll, save } from './JsonServerService'
 
 const Persons = ({ persons }) => persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
 
@@ -21,13 +21,17 @@ const App = () => {
   const [newPhoneNumber, setNewPhoneNumber] = useState('')
   const [filter, setFilter] = useState('')
 
+  const updatePersons = () => {
+    getAll()
+      .then(res => setPersons(state => state === undefined ? res : state))
+  }
+
   useEffect(() => {
     if (persons !== undefined) {
       // setPersons(state => state)
       return
     } 
-    axios.get('http://localhost:3001/persons')
-      .then(res => setPersons(state => state === undefined ? res.data : state))
+    updatePersons()
   }, [persons])
 
   const handleNameOnChange = (e) => {
@@ -50,6 +54,8 @@ const App = () => {
     setNewPhoneNumber(state => !personExists ? '' : state)
     if (personExists) {
       alert(`${newName} is already added to phonebook`)
+    } else {
+      save(newName, newPhoneNumber)
     }
   }
 
