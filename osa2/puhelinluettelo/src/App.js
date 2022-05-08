@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getAllPersons, savePerson, deletePerson, updatePerson } from './JsonServerService'
+import style from './App.module.css'
 
 const Persons = ({ persons, updatePersons }) => {
   return persons.map(person => {
@@ -28,15 +29,28 @@ const PersonForm = ({ handleSubmit, newName, newPhoneNumber, handleNameOnChange,
 </div>
 </form></>
 
+const Notification = ({ notification: { type, message }}) =>
+  <>
+    <div className={[style.Notification, style[type.toLocaleLowerCase()]].join(' ')}>
+      {message}
+    </div>
+  </>
+
 const App = () => {
   const [persons, setPersons] = useState(undefined)
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notification, setNotification] = useState(undefined)
 
   const updatePersons = () => {
     getAllPersons()
       .then(res => setPersons(res))
+  }
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message })
+    setTimeout(() => setNotification(undefined), 5000)
   }
 
   useEffect(() => {
@@ -66,22 +80,34 @@ const App = () => {
     const clearForm = !existingPerson || (existingPerson && confirmReplace)
     setNewName(state => clearForm ? '' : state)
     setNewPhoneNumber(state => clearForm ? '' : state)
-    if (existingPerson) {
+    if (existingPerson && confirmReplace) {
       updatePerson(existingPerson.id, newName, newPhoneNumber)
+        .then(res => {
+          showNotification('success', `Updated ${newName}`)
+          return res
+        })
         .then(_ => updatePersons())
-    } else {
+        .catch(e => {
+          showNotification('error', `Information of ${newName} has already been removed from server`)
+          updatePersons()
+          return e
+        })
+    } else if (!existingPerson) {
       savePerson(newName, newPhoneNumber)
         .then(_ => updatePersons())
+        .then(_ => {
+          showNotification('success', `Added ${newName}`)
+        })
     }
   }
 
   const allPersons = persons !== undefined ? persons : []
 
   const filteredPersons = filter.length > 0 ? allPersons.filter(({ name }) => name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) : allPersons
-
   return (
     <div>
       <h2>Phonebook</h2>
+      {notification && <Notification notification={notification} />}
       <Filter filter={filter} handleFilterOnChange={handleFilterOnChange} />
       <h3>add a new</h3>
       <PersonForm handleSubmit={handleSubmit} newName={newName} newPhoneNumber={newPhoneNumber} handleNameOnChange={handleNameOnChange} handlePhoneNumberOnChange={handlePhoneNumberOnChange}/>

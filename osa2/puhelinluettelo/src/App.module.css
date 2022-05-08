@@ -1,0 +1,17 @@
+.Notification {
+  padding: 1em;
+  border: solid 2px;
+  background-color: lightgray;
+  font-size: 1.5em;
+  margin-bottom: 1em;
+}
+
+.success {
+  border-color: green;
+  color: green;
+}
+
+.error {
+  border-color: red;
+  color: red;
+}
