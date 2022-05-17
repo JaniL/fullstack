@@ -98,6 +98,11 @@ const App = () => {
         .then(_ => {
           showNotification('success', `Added ${newName}`)
         })
+        .catch(error => {
+          showNotification('error', error.response.data.error)
+          updatePersons()
+          return error
+        })
     }
   }
 

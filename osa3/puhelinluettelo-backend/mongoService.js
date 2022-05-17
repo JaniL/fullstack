@@ -4,6 +4,6 @@ const password = process.env.MONGODB_PASSWORD
 
 mongoose.connect(`mongodb+srv://phonebook:${password}@cluster0.qhji7.mongodb.net/?retryWrites=true&w=majority`);
 
-const Person = mongoose.model('Person', { id: mongoose.ObjectId, name: String, number: String });
+const Person = mongoose.model('Person', { id: mongoose.ObjectId, name: { type: String, minLength: 3}, number: String });
 
 module.exports = { Person }
