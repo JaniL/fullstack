@@ -5,6 +5,7 @@ const cors = require('cors');
 let persons = require('./persons.json')
 
 const { Person } = require('./mongoService');
+const isValidObjectId = require('mongoose').isValidObjectId
 const res = require('express/lib/response');
 
 const app = express();
@@ -43,35 +44,52 @@ const personsHandler = (_, res, next) => {
 }
 
 const infoHandler = (_, res) => {
-  const html = `
-    <html>
-    <head>
-    <title>Phonebook info</title>
-    </html>
-    <body>
-      <p>Phonebook has info for ${persons.length} people</p>
-      <p>${new Date()}</p>
-    </body>
-  `
-  res.status(200).send(html);
+  Person.count()
+    .then(count => {
+      const html = `
+      <html>
+      <head>
+      <title>Phonebook info</title>
+      </html>
+      <body>
+        <p>Phonebook has info for ${count} people</p>
+        <p>${new Date()}</p>
+      </body>
+    `
+    res.status(200).send(html.trim());
+    })
 }
 
 const singlePersonHandler = (req, res) => {
-  const person = persons.find(({ id }) => Number(req.params.id) === Number(id))
-  if (person) {
-    res.status(200).send(person)
-  } else {
-    res.sendStatus(404)
+  if (!isValidObjectId(req.params.id)) {
+    res.status(500).json('Not a valid id')
+    return
   }
+  Person.findById(req.params.id)
+    .then(person => {
+      if (person) {
+        res.status(200).send(fixId(person))
+      } else {
+        res.sendStatus(404)
+      }
+    })
 }
 
 const deletePersonHandler = (req, res, next) => {
+  if (!isValidObjectId(req.params.id)) {
+    res.status(500).json('Not a valid id')
+    return
+  }
   Person.findByIdAndRemove(req.params.id).then(() => {
     res.sendStatus(204)
   }).catch(err => next(err))
 }
 
 const updatePersonHandler = (req, res, next) => {
+  if (!isValidObjectId(req.params.id)) {
+    res.status(500).json('Not a valid id')
+    return
+  }
   const { id } = req.params
   const { name, number } = req.body
   Person.findByIdAndUpdate(id, { name, number })
@@ -133,7 +151,7 @@ const errorHandler = (error, request, response, next) => {
 }
 
 const myOwnErrorHandler = (error, request, response, next) => {
-  res.status(500).json({ error: error.message })
+  response.status(500).json({ error: error.message })
 }
 
 app.use(errorHandler)
