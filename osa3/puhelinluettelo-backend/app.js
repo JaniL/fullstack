@@ -2,7 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const isObject = require('lodash.isobject')
 const cors = require('cors');
-let persons = require('./persons.json');
+let persons = require('./persons.json')
+
+const { Person } = require('./mongo')
 
 const app = express();
 
@@ -27,7 +29,9 @@ app.use(morganInstance)
 app.use(express.static('frontend'))
 
 const personsHandler = (_, res) => {
-  res.status(200).json(persons);
+  Person.find({}).then(persons => {
+    res.status(200).json(persons);
+  })
 }
 
 const infoHandler = (_, res) => {
