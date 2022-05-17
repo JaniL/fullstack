@@ -1,9 +1,11 @@
 const express = require('express');
+const morgan = require('morgan');
 const isObject = require('lodash.isobject')
 let persons = require('./persons.json');
 
 const app = express();
 app.use(express.json())
+app.use(morgan('tiny'))
 
 const personsHandler = (_, res) => {
   res.status(200).json(persons);
