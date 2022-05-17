@@ -28,9 +28,16 @@ app.use(morganInstance)
 
 app.use(express.static('frontend'))
 
+// can't bother fixing this in frontend so
+const fixId = person => ({
+  id: person._id,
+  name: person.name,
+  number: person.number
+})
+
 const personsHandler = (_, res) => {
   Person.find({}).then(persons => {
-    res.status(200).json(persons);
+    res.status(200).json(persons.map(fixId));
   })
 }
 
@@ -58,13 +65,9 @@ const singlePersonHandler = (req, res) => {
 }
 
 const deletePersonHandler = (req, res) => {
-  const person = persons.find(({ id }) => Number(req.params.id) === Number(id))
-  if (!person) {
-    res.sendStatus(404)
-    return
-  }
-  persons = persons.filter(({ id }) => Number(req.params.id) !== Number(id))
-  res.sendStatus(204)
+  Person.findByIdAndRemove(req.params.id).then(() => {
+    res.sendStatus(204)
+  })
 }
 
 const insertPersonHandler = (req, res) => {
