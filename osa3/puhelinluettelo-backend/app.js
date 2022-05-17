@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const isObject = require('lodash.isobject')
+const cors = require('cors');
 let persons = require('./persons.json');
 
 const app = express();
@@ -17,6 +18,8 @@ const morganInstance = morgan(function (tokens, req, res) {
     tokens['body'](req,res)
   ].join(' ')
 })
+
+app.use(cors())
 
 app.use(express.json())
 app.use(morganInstance)

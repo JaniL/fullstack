@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAllPersons, savePerson, deletePerson, updatePerson } from './JsonServerService'
+import { getAllPersons, savePerson, deletePerson, updatePerson } from './services/backend'
 import style from './App.module.css'
 
 const Persons = ({ persons, updatePersons }) => {
@@ -45,6 +45,7 @@ const App = () => {
 
   const updatePersons = () => {
     getAllPersons()
+      .then(res => res.data)
       .then(res => setPersons(res))
   }
 
@@ -55,7 +56,6 @@ const App = () => {
 
   useEffect(() => {
     if (persons !== undefined) {
-      // setPersons(state => state)
       return
     } 
     updatePersons()
