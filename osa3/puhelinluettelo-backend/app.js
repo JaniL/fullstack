@@ -92,20 +92,13 @@ const insertPersonHandler = (req, res) => {
     return
   }
 
-  const personExists = persons.find(({ name }) => name === req.body.name)
-
-  if (personExists) {
-    res.status(409).json({ error: 'Person already exists'})
-    return
-  }
-
-  const newPerson = {
-    id: Math.floor(Math.random() * 100),
+  const newPerson = new Person({
     name: req.body.name,
     number: req.body.number
-  }
-  persons = [...persons, newPerson]
-  res.status(201).json(newPerson)
+  })
+  newPerson.save().then(dbRes => {
+    res.status(201).json(dbRes)
+  })
 }
 
 app.get('/api/persons', personsHandler)
