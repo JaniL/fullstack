@@ -1,5 +1,5 @@
 const express = require('express');
-const persons = require('./persons.json');
+let persons = require('./persons.json');
 
 const app = express();
 
@@ -30,8 +30,19 @@ const singlePersonHandler = (req, res) => {
   }
 }
 
+const deletePersonHandler = (req, res) => {
+  const person = persons.find(({ id }) => Number(req.params.id) === Number(id))
+  if (!person) {
+    res.sendStatus(404)
+    return
+  }
+  persons = persons.filter(({ id }) => Number(req.params.id) !== Number(id))
+  res.sendStatus(204)
+}
+
 app.get('/api/persons', personsHandler)
 app.get('/api/persons/:id', singlePersonHandler)
+app.delete('/api/persons/:id', deletePersonHandler)
 
 app.get('/info', infoHandler)
 
