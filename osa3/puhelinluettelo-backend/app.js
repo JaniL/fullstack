@@ -3,11 +3,11 @@ const persons = require('./persons.json');
 
 const app = express();
 
-const personsHandler = (req, res) => {
+const personsHandler = (_, res) => {
   res.status(200).json(persons);
 }
 
-const infoHandler = (req, res) => {
+const infoHandler = (_, res) => {
   const html = `
     <html>
     <head>
@@ -21,8 +21,20 @@ const infoHandler = (req, res) => {
   res.status(200).send(html);
 }
 
+const singlePersonHandler = (req, res) => {
+  const person = persons.find(({ id }) => Number(req.params.id) === Number(id))
+  if (person) {
+    res.status(200).send(person)
+  } else {
+    res.sendStatus(404)
+  }
+}
+
 app.get('/api/persons', personsHandler)
+app.get('/api/persons/:id', singlePersonHandler)
+
 app.get('/info', infoHandler)
+
 
 const PORT = 3001
 app.listen(PORT, () => {
