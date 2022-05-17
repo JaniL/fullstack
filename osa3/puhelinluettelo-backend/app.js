@@ -4,7 +4,7 @@ const isObject = require('lodash.isobject')
 const cors = require('cors');
 let persons = require('./persons.json')
 
-const { Person } = require('./mongo')
+const { Person } = require('./mongoService')
 
 const app = express();
 
