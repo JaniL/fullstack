@@ -1,4 +1,5 @@
 const express = require('express');
+const isObject = require('lodash.isobject')
 let persons = require('./persons.json');
 
 const app = express();
@@ -43,18 +44,36 @@ const deletePersonHandler = (req, res) => {
 
 const insertPersonHandler = (req, res) => {
   const mandatoryFields = ['name', 'number']
-  if (typeof req.body !== 'object') {
-    res.sendStatus(500)
+  if (!isObject(req.body)) {
+    res.status(400).json({ error: 'Body data must be an JSON object'})
     return
   }
+
+  const fieldExist =
+    Object.fromEntries(
+      mandatoryFields
+      .map(field => [field, Object.keys(req.body).includes(field)])
+    )
   const fieldsExist =
-    mandatoryFields
-      .map(field => Object.keys(req.body).includes(field))
+    Object.values(fieldExist)
       .every(bool => bool === true)
   if (!fieldsExist) {
-    res.status(400).json('Invalid fields')
+    const fieldsMissing =
+      Object.entries(fieldExist)
+        .filter(([_, exists]) => exists === false)
+        .map(([field,]) => field)
+    const fieldWord = fieldsMissing.length > 1 ? 'fields' : 'field'
+    res.status(400).json({ error: `Following ${fieldWord} missing: ${fieldsMissing.join(', ')}`})
     return
   }
+
+  const personExists = persons.find(({ name }) => name === req.body.name)
+
+  if (personExists) {
+    res.status(409).json({ error: 'Person already exists'})
+    return
+  }
+
   const newPerson = {
     id: Math.floor(Math.random() * 100),
     name: req.body.name,
