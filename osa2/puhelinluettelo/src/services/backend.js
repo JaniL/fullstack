@@ -3,7 +3,7 @@ import axios from 'axios'
 const useProduction = process.env.REACT_APP_USE_HEROKU === 'true'
 
 const phonebookBackend = axios.create({
-  baseURL: useProduction ? 'https://janluu-phonebook-backend.herokuapp.com' : 'https://127.0.0.1:3001'
+  baseURL: useProduction ? 'https://janluu-phonebook-backend.herokuapp.com' : 'http://127.0.0.1:3001'
 })
 
 export const getAllPersons = () =>
@@ -15,6 +15,5 @@ export const savePerson = (newName, newPhoneNumber) =>
 export const deletePerson = (id) =>
   phonebookBackend.delete('/api/persons/' + id)
 
-export const updatePerson = (id, body) => {
-  throw new Error('Not implemented')
-}
+export const updatePerson = (id, newName, newNumber) =>
+  phonebookBackend.put('/api/persons/' + id, { name: newName, number: newNumber })

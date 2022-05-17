@@ -71,6 +71,15 @@ const deletePersonHandler = (req, res, next) => {
   }).catch(err => next(err))
 }
 
+const updatePersonHandler = (req, res, next) => {
+  const { id } = req.params
+  const { name, number } = req.body
+  Person.findByIdAndUpdate(id, { name, number })
+    .then(person => {
+      res.status(204).json(fixId(person))
+    }).catch(err => next(err))
+}
+
 const insertPersonHandler = (req, res, next) => {
   const mandatoryFields = ['name', 'number']
   if (!isObject(req.body)) {
@@ -108,6 +117,7 @@ const insertPersonHandler = (req, res, next) => {
 app.get('/api/persons', personsHandler)
 app.post('/api/persons', insertPersonHandler)
 app.get('/api/persons/:id', singlePersonHandler)
+app.put('/api/persons/:id', updatePersonHandler)
 app.delete('/api/persons/:id', deletePersonHandler)
 
 app.get('/info', infoHandler)
