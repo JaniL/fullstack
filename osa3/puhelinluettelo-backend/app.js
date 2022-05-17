@@ -4,7 +4,8 @@ const isObject = require('lodash.isobject')
 const cors = require('cors');
 let persons = require('./persons.json')
 
-const { Person } = require('./mongoService')
+const { Person } = require('./mongoService');
+const res = require('express/lib/response');
 
 const app = express();
 
@@ -35,10 +36,10 @@ const fixId = person => ({
   number: person.number
 })
 
-const personsHandler = (_, res) => {
+const personsHandler = (_, res, next) => {
   Person.find({}).then(persons => {
     res.status(200).json(persons.map(fixId));
-  })
+  }).catch(err => next(err))
 }
 
 const infoHandler = (_, res) => {
@@ -64,13 +65,13 @@ const singlePersonHandler = (req, res) => {
   }
 }
 
-const deletePersonHandler = (req, res) => {
+const deletePersonHandler = (req, res, next) => {
   Person.findByIdAndRemove(req.params.id).then(() => {
     res.sendStatus(204)
-  })
+  }).catch(err => next(err))
 }
 
-const insertPersonHandler = (req, res) => {
+const insertPersonHandler = (req, res, next) => {
   const mandatoryFields = ['name', 'number']
   if (!isObject(req.body)) {
     res.status(400).json({ error: 'Body data must be an JSON object'})
@@ -101,7 +102,7 @@ const insertPersonHandler = (req, res) => {
   })
   newPerson.save().then(dbRes => {
     res.status(201).json(dbRes)
-  })
+  }).catch(err => next(err))
 }
 
 app.get('/api/persons', personsHandler)
@@ -110,6 +111,23 @@ app.get('/api/persons/:id', singlePersonHandler)
 app.delete('/api/persons/:id', deletePersonHandler)
 
 app.get('/info', infoHandler)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+const myOwnErrorHandler = (error, request, response, next) => {
+  res.status(500).json({ error: error.message })
+}
+
+app.use(errorHandler)
+app.use(myOwnErrorHandler)
 
 
 const PORT = process.env.PORT || 3001
