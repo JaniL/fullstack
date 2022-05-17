@@ -24,6 +24,8 @@ app.use(cors())
 app.use(express.json())
 app.use(morganInstance)
 
+app.use(express.static('frontend'))
+
 const personsHandler = (_, res) => {
   res.status(200).json(persons);
 }
