@@ -1,7 +1,9 @@
-const { Router } = require('express')
+const { Router, json } = require('express')
 const { Blog } = require('../services/mongo')
 
 const blogRouter = new Router()
+
+blogRouter.use(json())
 
 blogRouter.route('/')
   .get((_, response) => {

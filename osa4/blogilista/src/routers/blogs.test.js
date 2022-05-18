@@ -6,13 +6,13 @@ const { Blog } = require('../services/mongo')
 const exampleBlog = { title: 'Blog', author: 'Aake', url: 'http://google.fi/', likes: 0}
 
 describe('blogs', () => {
+  let app;
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+    app = express();
+    app.use(blogRouter)
+  })
   describe('GET', () => {
-    let app;
-    beforeEach(async () => {
-      await Blog.deleteMany({})
-      app = express();
-      app.use(blogRouter)
-    })
 
     test('should return empty list of blogs when db is empty', async () => {
       const response = await request(app).get('/')
@@ -46,6 +46,18 @@ describe('blogs', () => {
       expect(response.body.length).toBe(1)
       expect(response.body[0]).toMatchObject(exampleBlog)
       expect(response.body[0]).toHaveProperty('id')
+    })
+  })
+
+  describe('POST', () => {
+    test('should create a new blog', async () => {
+      const response = await request(app).post('/').send(exampleBlog).set('Accept', 'application/json')
+      expect(response.statusCode).toBe(201)
+      expect(response.body).toMatchObject(exampleBlog)
+
+      const blogs = await Blog.find({})
+      expect(blogs.length).toBe(1)
+      expect(blogs[0]).toMatchObject(exampleBlog)
     })
   })
 })
