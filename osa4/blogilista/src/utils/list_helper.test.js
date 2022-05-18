@@ -94,3 +94,35 @@ describe('most blogs', () => {
     expect(result).toEqual(biggestAuthor)
   })
 })
+
+describe('most likes', () => {
+  test('is not found when the list is empty', () => {
+    const blogs = []
+
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toBe(null)
+  })
+
+  test('when list has only one blog equals the likes of that blog', () => {
+    const author = 'Aake'
+    const numberOfLikes = 9001
+    const authorWithLikes = { author, likes: numberOfLikes }
+    const singleBlogEntry = {...exampleBlogEntry, ...authorWithLikes}
+    const blogs = [
+      singleBlogEntry
+    ]
+
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toEqual(authorWithLikes)
+  })
+
+  test('is the author with largest number of likes', () => {
+    const numberOfLikes = 9001
+    const biggestAuthor = 'Matt Doe'
+    const groupOfLikeNumbers = ['Aake Kalliala', 'John', biggestAuthor, 'J-P Jepa', biggestAuthor]
+    const blogs = groupOfLikeNumbers.map(num => ({...exampleBlogEntry, author: num, likes: numberOfLikes }))
+
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toEqual({ author: biggestAuthor, likes: numberOfLikes * 2 })
+  })
+})
