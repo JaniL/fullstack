@@ -8,6 +8,14 @@ const blogSchema = mongoose.Schema({
   likes: Number
 })
 
+blogSchema.virtual('id').get(function(){
+  return this._id.toHexString();
+});
+
+blogSchema.set('toJSON', {
+  virtuals: true
+});
+
 const Blog = mongoose.model('Blog', blogSchema)
 
 mongoose.connect(MONGOURL)

@@ -37,5 +37,15 @@ describe('blogs', () => {
       expect(response.body.length).toBe(1)
       expect(response.body[0]).toMatchObject(exampleBlog)
     })
+
+    test('should return id with key id', async () => {
+      const newBlog = new Blog(exampleBlog)
+      await newBlog.save()
+      const response = await request(app).get('/')
+      expect(response.statusCode).toBe(200)
+      expect(response.body.length).toBe(1)
+      expect(response.body[0]).toMatchObject(exampleBlog)
+      expect(response.body[0]).toHaveProperty('id')
+    })
   })
 })
