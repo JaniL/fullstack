@@ -28,4 +28,14 @@ blogRouter.route('/')
       })
   })
 
+blogRouter.route('/:id')
+  .delete(async (request, response) => {
+    try {
+      const dbRes = await Blog.findByIdAndDelete(request.params.id)
+      response.status(200).json(dbRes)
+    } catch (error) {
+      response.status(500).json(error)
+    }
+  })
+
 module.exports = blogRouter
