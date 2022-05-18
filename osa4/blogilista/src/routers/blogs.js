@@ -37,5 +37,13 @@ blogRouter.route('/:id')
       response.status(500).json(error)
     }
   })
+  .put(async (request, response) => {
+    try {
+      const dbRes = await Blog.findByIdAndUpdate(request.params.id, request.body)
+      response.status(200).json(dbRes ? {...dbRes, ...request.body } : null)
+    } catch (error) {
+      response.status(500).json(error)
+    }
+  })
 
 module.exports = blogRouter

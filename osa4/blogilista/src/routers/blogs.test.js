@@ -90,6 +90,33 @@ describe('blogs', () => {
     })
   })
 
+  describe('PUT', () => {
+    test('should modify existing blog', async () => {
+      const newBlog = new Blog(exampleBlog)
+      await newBlog.save()
+      const modifiedBlog = {...exampleBlog, title: 'Piisamit'}
+      const response = await request(app).put('/' + newBlog.id).send(modifiedBlog).set('Accept', 'application/json')
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject(modifiedBlog)
+
+      const blogs = await Blog.find({})
+      expect(blogs.length).toBe(1)
+      expect(blogs[0]).toMatchObject(modifiedBlog)
+    })
+    test('should return 500 with invalid id', async () => {
+      const response = await request(app).put('/' + 'foo')
+      expect(response.statusCode).toBe(500)
+    })
+    test('should return 200 even if blog does not exist', async () => {
+      const newBlog = new Blog(exampleBlog)
+      await newBlog.save()
+      const id = newBlog.id
+      await Blog.findByIdAndDelete(id)
+      const response = await request(app).put('/' + newBlog.id)
+      expect(response.statusCode).toBe(200)
+    })
+  })
+
   describe('DELETE', () => {
     test('should delete a blog', async () => {
       const newBlog = new Blog(exampleBlog)
