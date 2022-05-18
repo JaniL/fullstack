@@ -60,6 +60,24 @@ describe('blogs', () => {
       expect(blogs[0]).toMatchObject(exampleBlog)
     })
 
+    test('should fail if title field missing', async () => {
+      const blogEntry = {...exampleBlog, title: undefined }
+      const response = await request(app).post('/').send(blogEntry).set('Accept', 'application/json')
+      expect(response.statusCode).toBe(400)
+
+      const blogs = await Blog.find({})
+      expect(blogs.length).toBe(0)
+    })
+
+    test('should fail if url field missing', async () => {
+      const blogEntry = {...exampleBlog, url: undefined }
+      const response = await request(app).post('/').send(blogEntry).set('Accept', 'application/json')
+      expect(response.statusCode).toBe(400)
+
+      const blogs = await Blog.find({})
+      expect(blogs.length).toBe(0)
+    })
+
     test('should create a new blog with zero likes if likes not defined', async () => {
       const blogEntry = {...exampleBlog, likes: undefined }
       const response = await request(app).post('/').send(blogEntry).set('Accept', 'application/json')
