@@ -14,7 +14,9 @@ blogRouter.route('/')
       })
   })
   .post((request, response) => {
-    const blog = new Blog(request.body)
+    const newEntry = request.body
+    const newEntryWithLikes = newEntry.likes ? newEntry : {...newEntry, likes: 0 }
+    const blog = new Blog(newEntryWithLikes)
   
     blog
       .save()

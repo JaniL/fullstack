@@ -59,5 +59,16 @@ describe('blogs', () => {
       expect(blogs.length).toBe(1)
       expect(blogs[0]).toMatchObject(exampleBlog)
     })
+
+    test('should create a new blog with zero likes if likes not defined', async () => {
+      const blogEntry = {...exampleBlog, likes: undefined }
+      const response = await request(app).post('/').send(blogEntry).set('Accept', 'application/json')
+      expect(response.statusCode).toBe(201)
+      expect(response.body).toMatchObject({...blogEntry, likes: 0})
+
+      const blogs = await Blog.find({})
+      expect(blogs.length).toBe(1)
+      expect(blogs[0]).toMatchObject({...blogEntry, likes: 0})
+    })
   })
 })
